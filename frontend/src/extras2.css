@@ -1,0 +1,172 @@
+/* ---------- service-uptime tile ---------- */
+
+/* three-row uptime list */
+.up-rows { display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+.up-row {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 12px; border-radius:12px; background:var(--panel-2);
+  border:1px solid var(--border);
+}
+.up-dot { width:9px; height:9px; border-radius:50%; flex:none; background:var(--muted); }
+.up-dot.normal { background:#3ecf8e; box-shadow:0 0 0 3px rgba(62,207,142,.18); }
+.up-dot.critical { background:#ef5b5b; box-shadow:0 0 0 3px rgba(239,91,91,.18); }
+.up-label { font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); min-width:64px; }
+.up-sub { font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1; }
+.up-value { margin-left:auto; font-size:17px; font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+/* DNS block inside the Internet & DNS tile */
+.dns-box { margin-top:0; }
+.flag-on { color:#3ecf8e; font-weight:700; }
+.flag-off { color:#e5a23c; font-weight:700; }
+
+/* ---------- clickable device rows ---------- */
+
+tbody tr.clickable-row {
+  cursor: pointer;
+}
+
+tbody tr.clickable-row:hover {
+  background: var(--accent-soft);
+}
+
+.link-btn {
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+/* ---------- reports submenu ---------- */
+
+.actions-menu .act-btn {
+  transition: transform 0.18s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.actions-menu .act-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--accent) 16%, transparent);
+  border-color: var(--accent);
+}
+
+/* live indicator on the devices card */
+.live-dot { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+.live-dot::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--muted); }
+.live-dot.on::before { background:#3ecf8e; animation:livepulse 1.6s ease-in-out infinite; }
+.live-dot.off::before { background:#e5a23c; }
+@keyframes livepulse { 0%,100% { opacity:1 } 50% { opacity:.35 } }
+
+/* ---------- queue manager ---------- */
+.qm { display:flex; flex-direction:column; gap:12px; }
+.qm-tabs { display:inline-flex; align-self:flex-start; padding:3px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border); }
+.qm-tabs button { border:0; background:transparent; color:var(--muted); font:inherit; font-weight:700; padding:6px 14px; border-radius:9px; cursor:pointer; }
+.qm-tabs button.on { background:var(--accent); color:#fff; }
+.qm-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.qm-search { flex:1; min-width:120px; }
+.qm-add { margin-left:auto; }
+.qm-list { max-height:min(52vh, 420px); margin-bottom:0; }
+.qm-row { display:flex; align-items:center; gap:10px; padding:2px 10px; border-radius:12px; border:1px solid var(--border); background:var(--panel-2); }
+.qm-row.sel { border-color:var(--accent); }
+.qm-row input[type=checkbox] { width:18px; height:18px; flex:none; }
+.qm-row-main { flex:1; min-width:0; display:grid; grid-template-columns:1.3fr 1fr auto auto; align-items:center; gap:10px; padding:9px 0; border:0; background:transparent; color:var(--text); font:inherit; text-align:left; cursor:pointer; }
+.qm-name { font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qm-target { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qm-limit { white-space:nowrap; text-align:right; }
+.qm-empty { text-align:center; padding:18px 8px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.qm-chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.qm-chip { border:1px solid var(--border); background:var(--panel-2); color:var(--text); font:inherit; font-weight:700; padding:7px 14px; border-radius:999px; cursor:pointer; }
+.qm-chip:hover:not(:disabled), .qm-chip.on { border-color:var(--accent); background:var(--accent); color:#fff; }
+.qm-back { align-self:flex-start; border:0; background:transparent; color:var(--accent); font:inherit; font-weight:700; cursor:pointer; padding:0; }
+.qm-title { margin:0; font-size:18px; }
+.qm-label { font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.qm .qm-chips { justify-content:flex-start; }
+.qm-two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.qm-adv { border:1px solid var(--border); border-radius:12px; padding:8px 12px; }
+.qm-adv summary { cursor:pointer; font-weight:700; color:var(--muted); }
+.qm-adv .field { margin-top:10px; }
+.qm-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+/* ---------- copy a device name ---------- */
+.copy-name { background:none; border:0; padding:0; font:inherit; color:inherit; text-align:left; cursor:copy; }
+.copy-name:hover { color:var(--accent); text-decoration:underline dotted; }
+.copied-tag { margin-left:8px; font-size:11px; font-weight:800; color:#3ecf8e; }
+.live-tag { margin-left:8px; font-size:11px; }
+
+/* ---------- report pictures ---------- */
+.report-preview { margin-top:12px; }
+.report-ticks { display:flex; flex-wrap:wrap; gap:16px; margin:8px 0 4px; }
+.speed-field { display:flex; flex-direction:column; gap:6px; }
+.speed-presets { gap:6px; }
+.speed-presets .qm-chip { padding:5px 11px; font-size:13px; }
+
+@keyframes mgslide { from { transform:translateX(40px); opacity:0 } to { transform:none; opacity:1 } }
+
+/* ---------- Manage sidebar (always visible at the left) ---------- */
+.check-shell.with-side { display:grid; grid-template-columns:auto minmax(0,1fr); gap:18px; align-items:start; }
+.check-main { min-width:0; }
+.side { width:248px; position:sticky; top:74px; max-height:calc(100vh - 92px); overflow:auto; display:flex; flex-direction:column; gap:10px; padding:12px; border-radius:20px; border:1px solid var(--border); background:var(--panel); backdrop-filter:blur(10px); transition:width .2s ease; }
+.side.collapsed { width:60px; padding:10px 8px; align-items:center; }
+.side-top { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:2px 2px 8px; border-bottom:1px solid var(--border); }
+.side.collapsed .side-top { flex-direction:column; border-bottom:0; padding-bottom:0; }
+.side-who { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.side-who strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.side-toggle { flex:none; width:30px; height:30px; border-radius:10px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); font:inherit; font-weight:800; cursor:pointer; }
+.side-toggle:hover { border-color:var(--accent); color:var(--accent); }
+.side-nav { display:flex; flex-direction:column; gap:10px; width:100%; }
+.side-group { display:flex; flex-direction:column; gap:3px; }
+.side-group-head { display:flex; align-items:center; justify-content:space-between; width:100%; padding:6px 8px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:inherit; font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; }
+.side-group-head:hover { background:var(--accent-soft); color:var(--text); }
+.side-chevron { transition:transform .18s; transform:rotate(-90deg); }
+.side-chevron.open { transform:none; }
+.side-sep { height:1px; width:70%; margin:4px auto; background:var(--border); }
+.side-item { display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border:1px solid transparent; border-radius:12px; background:transparent; color:var(--text); font:inherit; text-align:left; cursor:pointer; transition:background .15s, transform .15s; }
+.side.collapsed .side-item { justify-content:center; padding:6px; }
+.side-item:hover:not(:disabled) { background:var(--accent-soft); transform:translateX(2px); }
+.side-item.on { background:var(--accent); color:#fff; }
+.side-item:disabled { opacity:.5; cursor:not-allowed; }
+.side-badge { flex:none; width:28px; height:28px; display:grid; place-items:center; border-radius:9px; font-weight:800; font-size:13px; background:var(--accent-soft); color:var(--accent); }
+.side-item.on .side-badge { background:rgba(255,255,255,.22); color:#fff; }
+.side-item-text { display:flex; flex-direction:column; min-width:0; }
+.side-item-label { font-weight:700; font-size:14px; }
+.side-item-hint { font-size:11px; opacity:.7; }
+.side-panel { position:fixed; top:0; right:0; bottom:0; z-index:70; width:min(780px,100vw); display:flex; flex-direction:column; background:var(--panel-solid); border-left:1px solid var(--border-strong); box-shadow:-24px 0 70px rgba(0,0,0,.35); animation:mgslide .26s cubic-bezier(.2,.8,.2,1) both; }
+.side-panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border); }
+.side-panel-head h3 { margin:0; font-size:18px; letter-spacing:-.01em; }
+.side-panel-body { flex:1; overflow:auto; padding:18px 22px 28px; min-width:0; }
+@media (max-width: 900px) {
+  .check-shell.with-side { grid-template-columns:1fr; }
+  .side, .side.collapsed { position:static; width:auto; max-height:none; align-items:stretch; }
+}
+
+/* ---------- AP address copy chip ---------- */
+.ap-address { display:flex; flex-direction:column; gap:6px; margin-top:12px; }
+.copy-chip { align-self:flex-start; display:inline-flex; align-items:center; gap:12px; padding:8px 14px; border-radius:12px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); font-size:18px; font-weight:800; cursor:copy; }
+.copy-chip:hover { border-color:var(--accent); }
+.copy-chip-tag { font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; }
+
+
+/* ---------- compact top boxes and device rows ---------- */
+.searchbar { padding:10px 14px; }
+.searchbar .big-input { font-size:16px; padding:8px 12px; min-width:200px; border-radius:12px; }
+.searchbar .big-input.narrow { min-width:120px; }
+.searchbar .checkmeta { margin-top:6px; }
+.hero { margin-top:10px; padding:10px 16px; gap:12px; border-radius:18px; }
+.hero-avatar { width:42px; height:42px; border-radius:13px; font-size:20px; }
+.hero-name { font-size:20px; }
+.hero-sub { font-size:13px; }
+.dev-table th, .dev-table td { padding:5px 10px; white-space:nowrap; }
+.dev-table td { font-size:14px; }
+.small-btn { padding:5px 12px; font-size:12px; }
+
+
+/* ---------- sidebar open: the findings column gets narrower (and longer), the four boxes only shrink ---------- */
+.check-main { container-type: inline-size; }
+.check-shell:has(.side:not(.collapsed)) .d-left { grid-column: span 9; }
+.check-shell:has(.side:not(.collapsed)) .d-right { grid-column: span 3; }
+@container (max-width: 760px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .d-left, .d-right { grid-column: 1 / -1 !important; }
+}

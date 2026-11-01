@@ -1,0 +1,200 @@
+.steps {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.steps li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--panel-2);
+}
+
+.steps .t {
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.opt {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel-2);
+  cursor: pointer;
+}
+
+.opt input {
+  margin-top: 3px;
+}
+
+.preview {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* status image */
+
+.mode-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+
+.mode-tabs button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.mode-tabs button.on {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--btn-text);
+}
+
+.speed-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.speed-input {
+  display: flex;
+  gap: 6px;
+}
+
+.speed-input input {
+  flex: 1;
+  min-width: 0;
+}
+
+.img-save {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel-2);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.img-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.img-save img {
+  display: block;
+  width: 100%;
+}
+
+/* a link that looks like a button */
+
+a.btn {
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 800;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.2s;
+}
+
+a.btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+/* compact queue list */
+
+.q-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 360px;
+  overflow-y: auto;
+  margin-bottom: 14px;
+}
+
+.q-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.9fr auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.q-row:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.q-row-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.q-row-targets {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.q-row-limit {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}

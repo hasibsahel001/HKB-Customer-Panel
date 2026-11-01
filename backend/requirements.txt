@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic-settings
+librouteros
+sqlalchemy
+alembic
+argon2-cffi
+httpx
+pytest
