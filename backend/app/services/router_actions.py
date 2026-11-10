@@ -450,3 +450,107 @@ def save_dns(api, servers: list, allow_remote_requests: bool) -> dict:
         **{"allow-remote-requests": "yes" if allow_remote_requests else "no"},
     )
     return read_dns(api)
+
+
+# ---------------------------------------------------------------- limit user (temporary queues)
+
+LIMIT_ALLOW_NAME = "allow-h"
+LIMIT_BLOCK_NAME = "block-h"
+LIMIT_CLEANER = "hkb-limit-clean"
+_CLOCK_RE = re.compile(r"^(\d{1,2}):(\d{2}):(\d{2})$")
+
+
+def _upsert_limit_queue(path, rows, name: str, fields: dict) -> tuple:
+    for row in rows:
+        if row.get("name") == name:
+            path.update(**{".id": row[".id"]}, **fields)
+            return row[".id"], "updated"
+    return path.add(name=name, **fields), "added"
+
+
+def _router_time_plus(api, seconds: int):
+    """The router's clock `seconds` from now as HH:MM:SS, or None (unreadable, or past midnight)."""
+    try:
+        rows = list(api.path("system", "clock"))
+    except (KeyError, ros_exc.TrapError):
+        return None
+    match = _CLOCK_RE.match(str(rows[0].get("time", ""))) if rows else None
+    if not match:
+        return None
+    total = int(match.group(1)) * 3600 + int(match.group(2)) * 60 + int(match.group(3)) + seconds
+    if total >= 86400:
+        return None
+    return f"{total // 3600:02d}:{total % 3600 // 60:02d}:{total % 60:02d}"
+
+
+def apply_limit_user(api, *, allow_targets, allow_rate, block_target, block_rate, backup_seconds) -> dict:
+    """Creates (or re-enables) the two temporary queues and puts them first.
+
+    `allow-h` keeps the access point addresses fast and `block-h` squeezes the whole LAN, so the
+    customer's devices stop using the line and the support agent can reach the router. A simple
+    queue name is unique, so queues that already have these names are updated and switched on
+    instead of being duplicated.
+
+    A one-shot scheduler on the router removes them as a second guarantee if the panel is down.
+    """
+    allow_fields = {
+        "target": ",".join(normalize_targets(allow_targets)),
+        "max-limit": normalize_rate(allow_rate.split("/")[0]) + "/" + normalize_rate(allow_rate.split("/")[1]),
+        "disabled": "no",
+    }
+    block_fields = {
+        "target": ",".join(normalize_targets([block_target])),
+        "max-limit": normalize_rate(block_rate.split("/")[0]) + "/" + normalize_rate(block_rate.split("/")[1]),
+        "disabled": "no",
+    }
+    path = api.path("queue", "simple")
+    rows = list(path)
+    ours = {LIMIT_ALLOW_NAME, LIMIT_BLOCK_NAME}
+    first_other = next((row.get(".id") for row in rows if row.get("name") not in ours), None)
+
+    block_id, block_state = _upsert_limit_queue(path, rows, LIMIT_BLOCK_NAME, block_fields)
+    allow_id, allow_state = _upsert_limit_queue(path, rows, LIMIT_ALLOW_NAME, allow_fields)
+
+    # Queues are matched from the top: allow-h must come before block-h, and both before the rest.
+    if first_other is not None:
+        _command(api, "/queue/simple/move", f"=numbers={block_id}", f"=destination={first_other}")
+    _command(api, "/queue/simple/move", f"=numbers={allow_id}", f"=destination={block_id}")
+
+    scheduled = False
+    try:
+        scheduler = api.path("system", "scheduler")
+        for row in list(scheduler):
+            if row.get("name") == LIMIT_CLEANER:
+                scheduler.remove(row[".id"])
+        start = _router_time_plus(api, backup_seconds)
+        if start:
+            script = (
+                f"/queue simple remove [find name={LIMIT_ALLOW_NAME}]; "
+                f"/queue simple remove [find name={LIMIT_BLOCK_NAME}]; "
+                f"/system scheduler remove [find name={LIMIT_CLEANER}]"
+            )
+            scheduler.add(
+                name=LIMIT_CLEANER,
+                **{"start-time": start, "interval": "0s", "on-event": script, "comment": "HKB: removes the temporary limit queues"},
+            )
+            scheduled = True
+    except (KeyError, ros_exc.TrapError):
+        scheduled = False
+
+    return {"allow": allow_state, "block": block_state, "scheduled_on_router": scheduled}
+
+
+def clear_limit_user(api) -> int:
+    """Removes the temporary queues (and the router-side cleaner). Safe to run when nothing is there."""
+    path = api.path("queue", "simple")
+    ids = [row[".id"] for row in path if row.get("name") in (LIMIT_ALLOW_NAME, LIMIT_BLOCK_NAME)]
+    if ids:
+        path.remove(*ids)
+    try:
+        scheduler = api.path("system", "scheduler")
+        for row in list(scheduler):
+            if row.get("name") == LIMIT_CLEANER:
+                scheduler.remove(row[".id"])
+    except (KeyError, ros_exc.TrapError):
+        pass
+    return len(ids)

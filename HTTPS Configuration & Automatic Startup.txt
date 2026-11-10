@@ -1,0 +1,168 @@
+## HTTPS Configuration & Automatic Startup (Windows)
+
+### 1. Overview
+
+برای فعال‌سازی ارتباط امن HTTPS در پروژه HKB Customer Panel از **Caddy Server** به‌عنوان Reverse Proxy استفاده شده است.
+
+Caddy درخواست‌های HTTPS را دریافت کرده و آن‌ها را به Backend پروژه که با Python و FastAPI اجرا می‌شود، منتقل می‌کند.
+
+برای ایجاد گواهی SSL رایگان و محلی از قابلیت Internal TLS در Caddy استفاده شده است.
+
+### 2. System Architecture
+
+| Component | Address / Port |
+|---|---|
+| Client Access (HTTPS) | `https://192.168.255.22` |
+| Caddy HTTPS | `Port 443` |
+| Python / FastAPI Backend | `127.0.0.1:8000` |
+| Frontend | Served through the project |
+| SSL Certificate | Caddy Internal CA |
+
+**Request Flow:**
+
+`Client → HTTPS (443) → Caddy → Python Backend (8000)`
+
+### 3. Caddy Installation
+
+Caddy version: `v2.11.9`
+
+Installation directory:
+
+```text
+C:\Users\Cyber Phantom\Documents\Caddy
+```
+
+Main files:
+
+```text
+Caddy\
+├── caddy.exe
+└── Caddyfile
+```
+
+### 4. Caddy Configuration
+
+The `Caddyfile` contains the following configuration:
+
+```caddyfile
+https://192.168.255.22 {
+    tls internal
+    reverse_proxy 127.0.0.1:8000
+}
+```
+
+**Configuration explanation:**
+
+- `https://192.168.255.22`: Enables HTTPS access through the laptop's local IP.
+- `tls internal`: Generates a certificate using Caddy's internal Certificate Authority.
+- `reverse_proxy`: Forwards incoming requests to the local Python backend.
+
+### 5. Certificate Installation
+
+Caddy's local Root Certificate is installed on the server computer using:
+
+```cmd
+caddy.exe trust
+```
+
+Certificate location:
+
+```text
+%APPDATA%\Caddy\pki\authorities\local\root.crt
+```
+
+For other computers on the same network, the public Root Certificate must be installed manually.
+
+Copy `root.crt` to the client computer and run CMD as Administrator:
+
+```cmd
+certutil -addstore -f ROOT C:\Caddy\root.crt
+```
+
+**Security note:** Only distribute `root.crt`. Never share the private CA key (`root.key`).
+
+### 6. Automatic Startup Configuration
+
+To avoid manually starting Caddy and the Python backend, automatic startup is configured using Windows Task Scheduler and a VBScript launcher.
+
+Launcher file:
+
+```text
+C:\Users\Cyber Phantom\Documents\hkb-panel\start-hidden.vbs
+```
+
+The launcher performs the following operations:
+
+1. Starts Caddy using the existing Caddyfile.
+2. Waits for 3 seconds.
+3. Starts the HKB Customer Panel using `run-panel.bat`.
+4. Runs both processes without displaying CMD windows.
+
+Task Scheduler configuration:
+
+| Setting | Value |
+|---|---|
+| Task Name | HKB Website Auto Start |
+| Trigger | When I log on |
+| Program | `wscript.exe` |
+| Arguments | Path to `start-hidden.vbs` |
+
+This allows the website and HTTPS proxy to start automatically when the Windows user logs in.
+
+### 7. Windows Firewall
+
+Allow incoming HTTPS traffic on TCP port 443:
+
+```powershell
+New-NetFirewallRule -DisplayName "HKB HTTPS" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow
+```
+
+### 8. Accessing the Website
+
+Users connected to the same local network can access the panel using:
+
+```text
+https://192.168.255.22
+```
+
+Each client computer must have the Caddy Root Certificate installed to avoid browser certificate warnings.
+
+### 9. Important Notes
+
+- The server laptop must remain powered on.
+- Caddy and the Python backend must be running.
+- The server IP address should remain static (`192.168.255.22`).
+- Port `443/TCP` must be allowed through Windows Firewall.
+- The Root Certificate must be trusted on every client computer.
+- This configuration provides HTTPS for internal LAN access and does not automatically provide public internet access.
+- Caddy's internal certificate must be renewed or replaced if it expires or its CA is changed.
+
+### 10. Verification
+
+The following checks can be used to verify the configuration:
+
+**Check Caddy version:**
+
+```cmd
+caddy.exe version
+```
+
+**Check HTTPS access:**
+
+```text
+https://192.168.255.22
+```
+
+**Check API documentation through HTTPS:**
+
+```text
+https://192.168.255.22/docs
+```
+
+**Check Firewall port:**
+
+```powershell
+Test-NetConnection 192.168.255.22 -Port 443
+```
+
+**Expected Result:** The HKB Customer Panel should load through HTTPS, authenticate users successfully, and start automatically after Windows login.

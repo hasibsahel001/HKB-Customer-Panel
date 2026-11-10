@@ -47,7 +47,7 @@ def _unauthorized(code="not_authenticated", message="Authentication required"):
     return HTTPException(status_code=401, detail={"code": code, "message": message})
 
 
-def current_auth(request: Request, db: Session = Depends(get_db)) -> AuthContext:
+def _authenticate(request: Request, db: Session, touch: bool) -> AuthContext:
     token = request.cookies.get(settings.session_cookie_name)
     if not token:
         raise _unauthorized()
@@ -71,9 +71,23 @@ def current_auth(request: Request, db: Session = Depends(get_db)) -> AuthContext
         db.commit()
         raise _unauthorized()
 
-    session.last_seen_at = now
-    db.commit()
+    if touch:
+        session.last_seen_at = now
+        db.commit()
     return AuthContext(user=user, session=session)
+
+
+def current_auth(request: Request, db: Session = Depends(get_db)) -> AuthContext:
+    return _authenticate(request, db, touch=True)
+
+
+def passive_auth(request: Request, db: Session = Depends(get_db)) -> AuthContext:
+    """Like current_auth, but does not count as activity.
+
+    The chat polls every few seconds; if that kept the session alive, the idle timeout would
+    never apply to a tab that is just left open.
+    """
+    return _authenticate(request, db, touch=False)
 
 
 def require_csrf(

@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api import actions, audit_log, auth, customer, maintenance, users
+from app.api import actions, audit_log, auth, chat, customer, maintenance, users
 from app.core.errors import InvalidInput
 from app.db import init_db
 
@@ -51,6 +51,7 @@ app.include_router(audit_log.router)
 app.include_router(customer.router)
 app.include_router(actions.router)
 app.include_router(maintenance.router)
+app.include_router(chat.router)
 
 
 @app.exception_handler(InvalidInput)

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from './auth'
+import { ChatProvider } from './chat'
+import { ChatPanel, ChatToast } from './pages/ChatUI'
 import { AccountPage } from './pages/Account'
 import { AuditPage } from './pages/Audit'
 import { CheckPage } from './pages/Check'
@@ -42,7 +44,7 @@ export default function App() {
   ]
 
   return (
-    <>
+    <ChatProvider>
       <header className="topbar">
         <span className="brand">HKB Customer Panel</span>
         <nav className="nav">
@@ -76,6 +78,8 @@ export default function App() {
         {page === 'audit' && can('audit.view') && <AuditPage />}
         {page === 'account' && <AccountPage />}
       </main>
-    </>
+      <ChatToast />
+      <ChatPanel />
+    </ChatProvider>
   )
 }

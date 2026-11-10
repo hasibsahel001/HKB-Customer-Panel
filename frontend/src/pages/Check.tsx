@@ -6,6 +6,7 @@ import { ageSeconds, formatAge, formatTime } from '../format'
 import type { LiveResult, RecentItem, Report } from '../types'
 import { ErrorBox, Spinner } from '../ui'
 import { useLiveDevices } from '../useLiveDevices'
+import { ChatButton } from './ChatUI'
 import { ManageSidebar } from './ManageSidebar'
 import { CustomerHero, Dashboard, DashboardSkeleton } from './Dashboard'
 import { RecentModal } from './Recent'
@@ -201,6 +202,7 @@ export function CheckPage({ active = true }: { active?: boolean }) {
           <button className="btn secondary" type="button" onClick={() => void openRecent()}>
             Recent
           </button>
+          <ChatButton />
           {loading && (
             <span className="muted">
               <Spinner /> Reading the router…

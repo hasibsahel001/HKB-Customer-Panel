@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, LargeBinary, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -65,3 +65,28 @@ class RecentCheck(Base):
     identity: Mapped[str | None] = mapped_column(String(128), nullable=True)
     overall: Mapped[str | None] = mapped_column(String(16), nullable=True)
     checked_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
+class ChatMessage(Base):
+    """A message (text and/or one image) one panel user sent to the users online at that moment."""
+
+    __tablename__ = "chat_messages"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    text: Mapped[str] = mapped_column(Text, default="")
+    image: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    image_mime: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    reply_to_id: Mapped[int | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
+class ChatReceipt(Base):
+    """One recipient of a chat message; `read_at` stays empty until they open it."""
+
+    __tablename__ = "chat_receipts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    message_id: Mapped[int] = mapped_column(ForeignKey("chat_messages.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

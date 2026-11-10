@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     chain_imbalance_db: float = 8.0
 
     # LAN port and the customer's own access point
-    link_downs_warning: int = 3
+    link_downs_warning: int = 1
     ap_probe_peers: list[str] = ["10.10.10.2", "192.168.0.1", "192.168.1.1"]
     ap_expected_addresses: list[str] = ["192.168.0.2/24", "192.168.1.2/24"]
 
@@ -87,6 +87,19 @@ class Settings(BaseSettings):
     # The Windows VPN entry the panel creates for "Enter via Local IP" (only on a Windows panel PC)
     vpn_connection_name: str = "VPN"
     vpn_auto_connect: bool = False
+
+    # "Limit user": temporary queues that push the customer's devices down so the AP can be reached
+    limit_user_seconds: int = 120
+    limit_allow_rate: str = "10M/10M"
+    limit_block_target: str = "10.10.10.0/24"
+    limit_block_rate: str = "300k/300k"
+
+    # Chat between panel users
+    chat_online_seconds: int = 45
+    chat_keep_days: int = 7
+    chat_max_image_bytes: int = 2_000_000
+    chat_max_text: int = 2000
+    chat_sends_per_minute: int = 30
 
     # Recent customers list
     recent_hours: int = 24

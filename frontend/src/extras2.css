@@ -147,7 +147,6 @@ tbody tr.clickable-row:hover {
 .copy-chip:hover { border-color:var(--accent); }
 .copy-chip-tag { font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; }
 
-
 /* ---------- compact top boxes and device rows ---------- */
 .searchbar { padding:10px 14px; }
 .searchbar .big-input { font-size:16px; padding:8px 12px; min-width:200px; border-radius:12px; }
@@ -161,7 +160,6 @@ tbody tr.clickable-row:hover {
 .dev-table td { font-size:14px; }
 .small-btn { padding:5px 12px; font-size:12px; }
 
-
 /* ---------- sidebar open: the findings column gets narrower (and longer), the four boxes only shrink ---------- */
 .check-main { container-type: inline-size; }
 .check-shell:has(.side:not(.collapsed)) .d-left { grid-column: span 9; }
@@ -170,3 +168,7 @@ tbody tr.clickable-row:hover {
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .d-left, .d-right { grid-column: 1 / -1 !important; }
 }
+
+/* ---------- limit user ---------- */
+.limit-timer { display:flex; align-items:center; gap:10px; margin-top:12px; padding:10px 14px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border); }
+.limit-dot { width:10px; height:10px; border-radius:50%; background:#e5a23c; animation:livepulse 1.2s ease-in-out infinite; }

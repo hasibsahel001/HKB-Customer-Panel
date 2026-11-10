@@ -1,0 +1,42 @@
+### 11. Stop, Update and Restart
+
+When project modifications are required, follow these steps:
+
+**Step 1: Stop Caddy**
+
+Open CMD and execute:
+
+```cmd
+cd /d "C:\Users\Cyber Phantom\Documents\Caddy"
+caddy.exe stop
+```
+
+**Step 2: Stop Python Backend**
+
+Open PowerShell and execute:
+
+```powershell
+Get-CimInstance Win32_Process | Where-Object {$_.CommandLine -like '*uvicorn*'} | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+```
+
+**Step 3: Update Project**
+
+Modify the required Python, HTML, CSS, or Next.js files.
+
+If frontend source files have changed, rebuild the frontend when required.
+
+**Step 4: Restart the Website**
+
+Run the following file:
+
+```text
+C:\Users\Cyber Phantom\Documents\hkb-panel\start-hidden.vbs
+```
+
+Caddy and the Python backend will start again automatically.
+
+**Note:** After restarting, verify website access through:
+
+```text
+https://192.168.255.22
+```

@@ -21,6 +21,7 @@ from app.models import User
 from app.services import router_actions as ra
 from app.services.network_parsing import is_active_arp
 from app.services.snapshot import rows
+from app.services.limit_jobs import TIMERS, make_clear_job
 from app.services.update_jobs import JOBS, JobBusy, start_job_thread
 from app.services.usage import DEFAULT_SECONDS, sample_usage
 from app.services.windows_vpn import VpnSetupFailed, apply_pptp
@@ -401,6 +402,41 @@ async def vpn_connect(req: VpnLocal, request: Request, auth: AuthContext = Depen
         await log_audit(False, {"error": "timeout"})
         raise HTTPException(status_code=504, detail={"code": "timeout", "message": "The VPN setup took too long"})
     await log_audit(True, {"state": result.get("state"), "connected": result.get("connected")})
+    return result
+
+
+# ---------------------------------------------------------------- limit user (temporary queues)
+
+
+@router.post("/manage/limit-user")
+async def limit_user(req: Target, request: Request, auth: AuthContext = Depends(manage), db: Session = Depends(get_db)):
+    seconds = settings.limit_user_seconds
+
+    def work(conn):
+        result = ra.apply_limit_user(
+            conn.api,
+            allow_targets=[f"{peer}/32" for peer in settings.ap_probe_peers],
+            allow_rate=settings.limit_allow_rate,
+            block_target=settings.limit_block_target,
+            block_rate=settings.limit_block_rate,
+            backup_seconds=seconds + 30,
+        )
+        return {**result, "seconds": seconds}
+
+    result = await _execute(req, request, auth, db, "router.limit_user", work, {"seconds": seconds})
+    ip, tid = req.ip.strip(), req.tid.strip()
+    TIMERS.schedule(f"{ip}/{tid}", seconds, make_clear_job(ip, tid, auth.user.id))
+    return result
+
+
+@router.post("/manage/limit-user/clear")
+async def limit_user_clear(req: Target, request: Request, auth: AuthContext = Depends(manage), db: Session = Depends(get_db)):
+    result = await _execute(
+        req, request, auth, db, "router.limit_user_released",
+        lambda conn: {"removed": ra.clear_limit_user(conn.api)},
+        {},
+    )
+    TIMERS.cancel(f"{req.ip.strip()}/{req.tid.strip()}")
     return result
 
 

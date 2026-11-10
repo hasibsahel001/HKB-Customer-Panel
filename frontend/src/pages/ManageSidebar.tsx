@@ -10,6 +10,7 @@ import { ApAccessView } from './ApAccessView'
 import { CableReportView } from './CableReportView'
 import { CombinedReportView } from './CombinedReportView'
 import { ImageView } from './ImageView'
+import { LimitUserView } from './LimitUserView'
 import { QueueManager } from './QueueManager'
 import { TroubleshootReportView } from './TroubleshootReportView'
 import { UpdateView } from './UpdateView'
@@ -18,6 +19,7 @@ export type { ActionCustomer }
 
 type View =
   | 'queues'
+  | 'limit-user'
   | 'reboot'
   | 'update'
   | 'report-bandwidth'
@@ -97,6 +99,7 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
     title: 'Router',
     items: [
       { view: 'queues', label: 'Manage queues', hint: 'Speed limits' },
+      { view: 'limit-user', label: 'Limit user', hint: 'Free the line for 2 min' },
       { view: 'reboot', label: 'Reboot router', hint: 'Restart the router' },
       { view: 'update', label: 'Update RouterOS', hint: 'Latest stable + firmware' },
     ],
@@ -118,6 +121,7 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
 
 const TITLES: Record<View, string> = {
   queues: 'Manage queues',
+  'limit-user': 'Limit user',
   reboot: 'Reboot router',
   update: 'Update RouterOS',
   'report-bandwidth': 'Bandwidth report',
@@ -128,8 +132,8 @@ const TITLES: Record<View, string> = {
 }
 
 /**
- * The Manage sidebar at the left of the customer page, with the options grouped in folding
- * sections. It starts closed (narrow); an option opens its page in a panel at the right.
+ * The Manage sidebar: always shown at the left of the customer page, with the options grouped in
+ * folding sections. An option opens its page in a panel at the right; the sidebar stays usable.
  */
 export function ManageSidebar({ customer, report }: { customer: ActionCustomer; report: Report }) {
   const { can } = useAuth()
@@ -230,6 +234,7 @@ export function ManageSidebar({ customer, report }: { customer: ActionCustomer; 
             </header>
             <div className="side-panel-body">
               {view === 'queues' && <QueueManager ip={customer.ip} tid={customer.tid} />}
+              {view === 'limit-user' && <LimitUserView customer={customer} />}
               {view === 'reboot' && <RebootView customer={customer} />}
               {view === 'update' && canUpdate && <UpdateView customer={customer} />}
               {view === 'report-bandwidth' && <ImageView customer={customer} report={report} />}
